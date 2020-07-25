@@ -1,0 +1,11 @@
+# Pure `MSP430FR5994` firmware in C++
+
+## Features
+
+* Depends **only** on:
+** `msp430-elf-` GCC 9.x toolchain
+** `mspdebug` programmer
+** `cmake`
+* Cost-free abstractions:
+Device drivers are inline methods of data-less template classes, so they take no memory and compile usually to a single *asm* instruction.
+
