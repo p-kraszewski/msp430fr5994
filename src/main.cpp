@@ -8,6 +8,8 @@
 
 #include "lib/msp430fr5994.h"
 
+#pragma ide diagnostic ignored "EndlessLoop"
+
 volatile unsigned int i DATA_TINY = 0;
 
 void delay(MSP430::u16 n) {
@@ -30,4 +32,4 @@ int main() {
     }
 }
 
-IRQ_HANDLER void irq_TB0_CCR0() {}
+// IRQ_HANDLER(irq_TB0_CCR0) {}

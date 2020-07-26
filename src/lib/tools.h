@@ -9,7 +9,7 @@
 #pragma once
 
 #define PACKED __attribute((packed))
-#define IRQ_HANDLER extern "C" __attribute((interrupt))
+#define IRQ_HANDLER(id) extern "C" __attribute((interrupt)) void id()
 
 #define CODE_HIGH __attribute((section(".text.high")))
 #define DATA_LEA __attribute((section(".bss.lea")))
