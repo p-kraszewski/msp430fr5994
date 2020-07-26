@@ -3,6 +3,13 @@
 #define PACKED __attribute((packed))
 #define IRQ_HANDLER extern "C" __attribute((interrupt))
 
+#define CODE_HIGH __attribute((section(".text.high")))
+#define DATA_LEA __attribute((section(".bss.lea")))
+#define DATA_TINY __attribute((section(".bss.tiny")))
+#define DATA_PERSISTENT __attribute((section(".persistent.low")))
+#define DATA_PERSISTENT_HIGH __attribute((section(".persistent.high")))
+#define NONLINE __attribute((noinline))
+
 namespace MSP430 {
     typedef unsigned char u8;
     typedef signed char i8;
@@ -46,9 +53,10 @@ namespace MSP430 {
     class IOBITRANGE {
         static constexpr u8 lowBit = (firstBit > lastBit) ? lastBit : firstBit;
         static constexpr u8 highBit = (firstBit > lastBit) ? firstBit : lastBit;
-        static constexpr u8 bitLength = highBit - lowBit + 1;
+        static constexpr u8 bitLength = highBit - lowBit;
         static constexpr u8 sizeInBits = 8 * sizeof(type);
-        static constexpr type bitMask = (~(type) 0u >> (sizeInBits - bitLength));
+        static constexpr type allOnes = ~(type) 0u;
+        static constexpr type bitMask = allOnes >> (sizeInBits - bitLength);
         static_assert(lowBit + bitLength < sizeInBits, "IOBITRANGE falls of register");
         static_assert(bitLength > 0, "IOBITRANGE null length");
 
@@ -58,10 +66,14 @@ namespace MSP430 {
     public:
         inline type get() { return (ref() >> lowBit) & bitMask; }
         inline void set(type in) {
-            constexpr type andMask = ((type)(~bitMask)) << lowBit;
-            type orMask = (in & bitMask) << lowBit;
-            type t = ref();
-            ref() = (t & andMask) | orMask;
+            ref() &= ~(bitMask << lowBit);
+            ref() |= (in & bitMask) << lowBit;
+        }
+        inline void set_atomic(type in) {
+            type tmp = ref();
+            tmp &= ((type)(~bitMask)) << lowBit;
+            tmp |= (in & bitMask) << lowBit;
+            ref() = tmp;
         }
         inline void clr() { return set(0); }
         inline operator type() { return get(); }

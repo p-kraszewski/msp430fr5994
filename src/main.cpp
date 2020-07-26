@@ -1,6 +1,11 @@
 #include "lib/msp430fr5994.h"
 
-volatile unsigned int i = 0;
+DATA_TINY volatile unsigned int i = 0;
+
+CODE_HIGH NONLINE void delay(MSP430::u16 n) {
+    for (i = 0; i < n; i++)
+        ;
+}
 
 int main() {
     using namespace MSP430::dev;
@@ -12,12 +17,11 @@ int main() {
     //p1.DIR.bit<1>().set();
     p1.OUT = 0b01;
     //    tb0.ccr<3>().bclr(1);
-    //    p1.OUT.bits<0u, 2u>() = 3;
+    //    p1.OUT.bits<4, 7>() = 3;
 
     while (true) {
         p1.OUT ^= 0b11;
-        for (i = 0; i < 20000; i++)
-            ;
+        delay(20000);
     }
 }
 
