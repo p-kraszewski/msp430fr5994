@@ -1,11 +1,62 @@
 # Pure `MSP430FR5994` firmware in C++
+Paweł Kraszewski <root@linuxpedia.pl>
+:lang: en
+:source-highlighter: pygments
+:icons: font
+#:sectnums:
+:toc:
+:toclevels: 3
 
 ## Features
 
-* Depends **only** on:
-** `msp430-elf-` GCC 9.x toolchain
-** `mspdebug` programmer
-** `cmake`
-* Cost-free abstractions:
-Device drivers are inline methods of data-less template classes, so they take no memory and compile usually to a single *asm* instruction.
+This code depends **only** on:
 
+* `msp430-elf-` GCC 9.x toolchain
+* `mspdebug` programmer
+* `cmake`
+
+All device drivers are data-less template classes with inline methods, so they take _no memory_ and usually compile to a _single assembly instruction_:
+
+[source,cpp]
+----
+#include "lib/msp430fr5994.h"
+
+int main()
+{
+    using namespace MSP430::FR5994;
+    wdt_a.stop();
+}
+----
+
+is compiled into
+
+[source,asm]
+----
+    mov     #0x5a80, &0x015c
+----
+
+## Word, byte, bit-range and bit manipulators
+
+Each device register is manipulable by a set of methods and operators:
+
+[source,cpp]
+----
+#include "lib/msp430fr5994.h"
+
+int main()
+{
+    using namespace MSP430::FR5994;
+
+    p1.OUT = 0xAE;  // Assign a full register
+
+    p1.OUT |= 0x02; // Set mask
+    p1.OUT &= 0xFE; // Clear mask
+    p1.OUT ^= 0x81; // Toggle mask
+
+    p1.OUT += 3;    // Set 3rd bit
+    p1.OUT -= 4;    // Set 4th bit
+    p1.OUT %= 5;    // Flip 5th bit
+
+    p1.OUT.bit<1> = true;
+}
+----

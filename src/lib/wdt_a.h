@@ -1,15 +1,25 @@
+/* --------------------------------------------------------------------------
+ * -- (C) 2020 Paweł Kraszewski                                            --
+ * --                                                                      --
+ * -- Licensed as:                                                         --
+ * --   Attribution-NonCommercial-ShareAlike 4.0 International             --
+ * --   https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode        --
+ * ------------------------------------------------------------------------*/
+
 #pragma once
 
-namespace MSP430::WDT_A {
+namespace MSP430::Driver::WDT_A {
 
-    constexpr u16 WDTPW = 0x5a00;
-    constexpr u16 WDTHOLD = 0x0080;
+    using MSP430::Tools::IOREG;
 
-    template<u16 offs>
+    template <u16 addr>
     struct wdt_a {
-        IOREG<u16, offs> WDCTL;
+        static constexpr u16 WDTPW = 0x5a00;
+        static constexpr u16 WDTHOLD = 0x0080;
+
+        IOREG<u16, addr> WDCTL;
 
         inline void stop() { WDCTL = WDTPW | WDTHOLD; }
         inline void start() { WDCTL = WDTPW; }
     } PACKED;
-}// namespace MSP430::WDT_A
+}  // namespace MSP430::Driver::WDT_A

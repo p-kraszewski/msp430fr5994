@@ -1,2 +1,11 @@
+# --------------------------------------------------------------------------
+# -- (C) 2020 Paweł Kraszewski                                            --
+# --                                                                      --
+# -- Licensed as:                                                         --
+# --   Attribution-NonCommercial-ShareAlike 4.0 International             --
+# --   https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode        --
+# --------------------------------------------------------------------------
+
 /cmake-*/
 /.idea/
+*.pdf

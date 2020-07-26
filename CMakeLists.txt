@@ -1,5 +1,12 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
+# --------------------------------------------------------------------------
+# -- (C) 2020 Paweł Kraszewski                                            --
+# --                                                                      --
+# -- Licensed as:                                                         --
+# --   Attribution-NonCommercial-ShareAlike 4.0 International             --
+# --   https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode        --
+# --------------------------------------------------------------------------
 
+CMAKE_MINIMUM_REQUIRED(VERSION 3.16)
 
 SET(CMAKE_SYSTEM_NAME Linux)
 SET(CMAKE_SYSTEM_PROCESSOR msp430)
@@ -28,6 +35,7 @@ SET(CMAKE_CXX_FLAGS "${COMP_ARCH} ${C_FLAGS}")
 SET(CMAKE_C_FLAGS "${COMP_ARCH} ${C_FLAGS}")
 SET(CMAKE_ASM_FLAGS "${COMP_ARCH} ${ASM_FLAGS}")
 STRING(REPLACE "-O3" "" CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE}")
+STRING(REPLACE "-DNDEBUG" "" CMAKE_ASM_FLAGS_RELEASE "${CMAKE_ASM_FLAGS_RELEASE}")
 
 SET(LD_FLAGS "${LINKER_FLAGS}")
 SET(LDFLAGS "${LINKER_FLAGS}")
