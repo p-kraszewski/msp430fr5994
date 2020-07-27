@@ -14,8 +14,47 @@ namespace MSP430::Driver::Timer {
     using MSP430::Tools::IOREG;
 
     template <u16 addr, u8 captureRegsCount>
-    struct timer {
-        enum class CTLe : u16 {
+    struct TATB {
+        enum class CTLA : u16 {
+
+            CLK_M = 0b11 << 8,   //!< Timer_A clock source select
+            CLK_TA = 0b00 << 8,  //!< TAxCLK
+            CLK_A = 0b01 << 8,   //!< ACLK
+            CLK_SM = 0b10 << 8,  //!< SMCLK
+            CLK_IN = 0b11 << 8,  //!< INCLK
+
+            DIV_M = 0b11 << 6,  //!< Input divider. These bits, along with the
+            //!< TBIDEX bits, select the divider for the
+            //!< input clock.
+            DIV_1 = 0b00 << 6,  //!< 1
+            DIV_2 = 0b01 << 6,  //!< 1/2
+            DIV_4 = 0b10 << 6,  //!< 1/4
+            DIV_8 = 0b11 << 6,  //!< 1/8
+
+            MODE_M = 0b11 << 4,  //!< Mode mask
+            STOP = 0b00 << 4,    //!< Stop mode: Driver is halted
+            UP = 0b01 << 4,      //!< Up mode: Driver counts up to TBxCL0
+            CONT = 0b10 << 4,    //!< Continuous mode: Driver counts up to the
+            //!< value set by CNTL
+            UP_DOWN = 0b11 << 4,  //!< Up/down mode: Driver counts up to TBxCL0
+            //!< and down to 0000h
+
+            TBCLR = 1 << 2,  //!< Setting this bit clears TBR, the clock divider
+            //!< logic (the divider setting remains unchanged), and
+            //!< the count direction. The TBCLR bit is
+            //!< automatically reset and is always read as zero.
+
+            TBIE_M = 0b1 << 1,  //!< Timer_B interrupt enable. This bit enables
+            //!< the TBIFG interrupt request.
+            TBIE_D = 0b1 << 1,  //!< Interrupt disabled
+            TBIE_E = 0b1 << 1,  //!< Interrupt enabled
+
+            TBIFG_M = 0b1 << 0,  //!< Timer_B interrupt flag
+            TBIFG_N = 0b0 << 0,  //!< No interrupt pending
+            TBIFG_P = 0b1 << 0,  //!< Interrupt pending
+        };
+
+        enum class CTLB : u16 {
             //! TBxCLn grouping
             TBCLGRP_M = 0b11 << 13,
 
@@ -43,11 +82,11 @@ namespace MSP430::Driver::Timer {
             CNTL_10 = 0b10 << 11,  //!< 10-bit, TBxR(max) = 03FFh
             CNTL_08 = 0b11 << 11,  //!< 8-bit, TBxR(max) = 0FFh
 
-            SRC_M = 0b11 << 8,  //!< Timer_B clock source select
-            TBCLK = 0b00 << 8,  //!< TBxCLK
-            ACLK = 0b01 << 8,   //!< ACLK
-            SMCLK = 0b10 << 8,  //!< SMCLK
-            INCLK = 0b11 << 8,  //!< INCLK
+            CLK_M = 0b11 << 8,   //!< Timer_B clock source select
+            CLK_TB = 0b00 << 8,  //!< TAxCLK
+            CLK_A = 0b01 << 8,   //!< ACLK
+            CLK_SM = 0b10 << 8,  //!< SMCLK
+            CLK_IN = 0b11 << 8,  //!< INCLK
 
             DIV_M = 0b11 << 6,  //!< Input divider. These bits, along with the
                                 //!< TBIDEX bits, select the divider for the

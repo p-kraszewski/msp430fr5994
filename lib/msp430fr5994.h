@@ -30,9 +30,9 @@ namespace MSP430::FR5994 {
     Driver::GPIO::port_int<0x261> p8;
     Driver::GPIO::port_simple<0x320> pj;
 
-    Driver::Timer::timer<0x340, 3> ta0;
-    Driver::Timer::timer<0x380, 3> ta1;
-    Driver::Timer::timer<0x380, 2> ta2;
-    Driver::Timer::timer<0x440, 2> ta3;
-    Driver::Timer::timer<0x3C0, 7> tb0;
+    Driver::Timer::TATB<0x340, 3> ta0;
+    Driver::Timer::TATB<0x380, 3> ta1;
+    Driver::Timer::TATB<0x380, 2> ta2;
+    Driver::Timer::TATB<0x440, 2> ta3;
+    Driver::Timer::TATB<0x3C0, 7> tb0;
 }  // namespace MSP430::FR5994
