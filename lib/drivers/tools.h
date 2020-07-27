@@ -31,34 +31,88 @@ namespace MSP430 {
     static_assert(sizeof(u32) == 4, "Bad u32/i32");
 
     namespace Tools {
+        /**
+         * Image of a single bit of a specific port
+         * @tparam reg - type of port: u16 or u8
+         * @tparam addr - base address of port
+         * @tparam bitNo - bit number to access
+         */
         template <typename reg, u16 addr, u8 bitNo>
         class IOBIT {
             static constexpr u8 sizeInBits = 8 * sizeof(reg);
-            static constexpr reg bitMask = 1 << bitNo;
+            static constexpr reg bitMask = 1u << bitNo;
             static_assert(bitNo < sizeInBits);
 
           private:
             inline volatile reg &ref() { return *((volatile reg *)addr); }
 
           public:
+            /**
+             * Set bit to 1
+             */
             inline void set() { ref() |= bitMask; }
-            inline void flip() { ref() ^= bitMask; }
+
+            /**
+             * Set bit to 0
+             */
             inline void clear() { ref() &= ~bitMask; }
 
-            inline operator bool() { return (ref() & bitMask) != 0; }
+            /**
+             * Toggle value of bit
+             */
+            inline void toggle() { ref() ^= bitMask; }
 
-            inline void operator=(reg v) {
+            /**
+             * Return value of bit as bool
+             * @return
+             */
+            explicit inline operator bool() { return (ref() & bitMask) != 0; }
+
+            /**
+             * Return value of bit as int
+             * @return value of 0 or 1
+             */
+            explicit inline operator reg() {
+                return ((ref() & bitMask) == 0) ? 0 : 1;
+            }
+
+            /**
+             * Assign value to bit
+             * @param v non-zero means 1
+             */
+            inline IOBIT<reg, addr, bitNo> &operator=(reg v) {
                 if (v != 0)
                     set();
                 else
                     clear();
+                return *this;
             }
 
+            /**
+             * Shortcut of bit set
+             */
             inline void operator++() { set(); }
+
+            /**
+             * Shortcut of bit clear
+             */
             inline void operator--() { clear(); }
-            inline void operator!() { flip(); }
+
+            /**
+             * Shortcut of bit toggle
+             */
+            inline void operator!() { toggle(); }
         };
 
+        /**
+         * Image of a bit range of a specific port.
+         * Order of `firstBit` and `lastBit` does not matter
+         *
+         * @tparam reg - type of port: u16 or u8
+         * @tparam addr - address of port
+         * @tparam firstBit - begin of bit range
+         * @tparam lastBit - end of bit range
+         */
         template <typename reg, u16 addr, u8 firstBit, u8 lastBit>
         class IOBITRANGE {
             static constexpr u8 lowBit =
@@ -78,88 +132,218 @@ namespace MSP430 {
             inline volatile reg &ref() { return *((volatile reg *)addr); }
 
           public:
+            /**
+             * Get value of bit range as int
+             * @return
+             */
             inline reg get() { return (ref() >> lowBit) & bitMask; }
+
+            /**
+             * Set new value to bit range.
+             * Update is performed in two port read-modify-wites:
+             *   - mask old value,
+             *   - insert new value
+             * @param in new value
+             */
             inline void set(reg in) {
                 ref() &= ~(bitMask << lowBit);
                 ref() |= (in & bitMask) << lowBit;
             }
-            inline void set_atomic(reg in) {
+
+            /**
+             * Set bit range to all-ones
+             */
+            inline void set() { ref() |= bitMask << lowBit; }
+
+            /**
+             * Set new value to bit range atomically.
+             * Update is performed as single rad-modify-write with the help of
+             * temporary variable:
+             *   - read port to temp var,
+             *   - mask and insert new value into temp var
+             *   - write temp var back to port
+             * @param in new value
+             */
+            inline void set_atomic(reg in = bitMask) {
                 reg tmp = ref();
                 tmp &= ((reg)(~bitMask)) << lowBit;
                 tmp |= (in & bitMask) << lowBit;
                 ref() = tmp;
             }
-            inline void clr() { return set(0); }
-            inline operator reg() { return get(); }
-            inline void operator=(reg in) { set(in); }
+
+            /**
+             * Clear range
+             */
+            inline void clr() { ref() &= ~(bitMask << lowBit); }
+
+            /**
+             * Cast tange to integer
+             * @return value
+             */
+            explicit inline operator reg() { return get(); }
+
+            /**
+             * Assign to range
+             * @param in new value
+             */
+            inline IOBITRANGE<reg, addr, firstBit, lastBit> &operator=(reg in) {
+                set(in);
+                return *this;
+            }
         };
 
+        /**
+         * Image of single port of device
+         * @tparam reg - type of port: u16 or u8
+         * @tparam addr - base address of port
+         */
         template <typename reg, u16 addr>
         class IOREG {
           private:
             inline volatile reg &ref() { return *((volatile reg *)addr); }
 
           public:
-            inline void W(reg nv) { ref() = nv; }
-            inline reg R() { return ref(); }
+            /**
+             * Set new value to port
+             * @param in new value
+             */
+            inline void set(reg in) { ref() = in; }
 
-            inline void bset(u8 m) { ref() |= (1 << m); }
+            /**
+             * Assign new value to port
+             * @param in new value
+             * @return
+             */
+            inline IOREG<reg, addr> &operator=(reg in) {
+                ref() = in;
+                return *this;
+            }
 
-            inline void bclr(u8 m) { ref() &= ~(1 << m); }
+            /**
+             * Get value from port
+             * @return
+             */
+            inline reg get() { return ref(); }
 
-            inline void btoggle(u8 m) { ref() ^= (1 << m); }
+            /**
+             * Set single bit in port
+             * Warning, there's no check if bit number is in range. If
+             * bit number is constant, prefer to use bit<nr>() accessor that
+             * is checked during compile-time,
+             * @param m bit number.
+             */
+            inline void bset(u8 m) { ref() |= (1u << m); }
 
-            inline IOREG<reg, addr> &mask_set(reg mask, reg val) {
+            /**
+             * Clear single bit in port
+             * Warning, there's no check if bit number is in range. If
+             * bit number is constant, prefer to use bit<nr>() accessors that
+             * is checked during compile-time,
+             * @param m bit number.
+             */
+            inline void bclr(u8 m) { ref() &= ~(1u << m); }
+
+            /**
+             * Toggle single bit in port
+             * Warning, there's no check if bit number is in range. If
+             * bit number is constant, prefer to use bit<nr>() accessor that
+             * is checked during compile-time,
+             * @param m bit number.
+             */
+            inline void btoggle(u8 m) { ref() ^= (1u << m); }
+
+            /**
+             * Mask and set value of register.
+             * Update is performed as single read-modify-write with the help of
+             * temporary variable:
+             *   - read port to temp var,
+             *   - AND and OR new values into temp var
+             *   - write temp var back to port
+             * @param and_val - data to be ANDed with register
+             * @param or_val - data to be ORed with register
+             */
+            inline void mask_set(reg and_val, reg or_val) {
                 auto tmp = ref();
-                tmp &= mask;
-                tmp |= val;
+                tmp &= and_val;
+                tmp |= or_val;
                 ref() = tmp;
-                return *this;
             }
 
-            inline IOREG<reg, addr> &operator|=(reg m) {
-                ref() |= m;
-                return *this;
-            }
-            inline IOREG<reg, addr> &operator&=(reg m) {
-                ref() &= m;
-                return *this;
-            }
-            inline IOREG<reg, addr> &operator^=(reg m) {
-                ref() ^= m;
-                return *this;
-            }
-            inline IOREG<reg, addr> &operator=(reg m) {
-                ref() = m;
-                return *this;
-            }
-            inline IOREG<reg, addr> &operator+=(u8 m) {
-                bset(m);
-                return *this;
-            }
-            inline IOREG<reg, addr> &operator-=(u8 m) {
-                bclr(m);
-                return *this;
-            }
-            inline IOREG<reg, addr> &operator%=(u8 m) {
-                btoggle(m);
-                return *this;
-            }
+            /**
+             * Set bits of register
+             * @param m value
+             */
+            inline void operator|=(reg m) { ref() |= m; }
 
-            template <u8 bitNo>
-            inline IOBIT<reg, addr, bitNo> bit() {
-                IOBIT<reg, addr, bitNo> b;
+            /**
+             * Mask bits of register
+             * @param m value
+             */
+            inline void operator&=(reg m) { ref() &= m; }
+
+            /**
+             * Toggle bits of register
+             * @param m value
+             */
+            inline void operator^=(reg m) { ref() ^= m; }
+
+            /**
+             * Set specific bit in register (no range check)
+             * @param bitNr bit number
+             */
+            inline void operator+=(u8 bitNr) { bset(bitNr); }
+
+            /**
+             * Clear specific bit in register (no range check)
+             * @param bitNr bit number
+             */
+            inline void operator-=(u8 bitNr) { bclr(bitNr); }
+
+            /**
+             * Toggle specific bit in register (no range check)
+             * @param bitNr bit number
+             */
+            inline void operator%=(u8 bitNr) { btoggle(bitNr); }
+
+            /**
+             * Return single bit accessor.
+             * @tparam bitNr bit number. It is compile-time checked for
+             * validity.
+             * @return
+             */
+            template <u8 bitNr>
+            inline IOBIT<reg, addr, bitNr> bit() {
+                IOBIT<reg, addr, bitNr> b;
                 return b;
             }
 
+            /**
+             * Return bit range accessor.
+             * Order of ends does not matter. Ends are compile-time checked for
+             * validity.
+             * @tparam firstBit begin of bit range, inclusive
+             * @tparam lastBit  end of bit range, inclusive
+             * @return
+             */
             template <u8 firstBit, u8 lastBit>
             inline IOBITRANGE<reg, addr, firstBit, lastBit> bits() {
                 IOBITRANGE<reg, addr, firstBit, lastBit> br;
                 return br;
             }
 
-            inline bool operator&&(reg m) { return (ref() & m) == m; }
-            inline bool operator||(reg m) { return (ref() & m) != 0; }
+            /**
+             * Check if **all** bits selected by mask are set
+             * @param mask - bits to check
+             * @return
+             */
+            inline bool operator&&(reg mask) { return (ref() & mask) == mask; }
+
+            /**
+             * Check if **any** bit selected by mask is set
+             * @param mask - bits to check
+             * @return
+             */
+            inline bool operator||(reg mask) { return (ref() & mask) != 0; }
         };
 
     }  // namespace Tools

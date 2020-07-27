@@ -13,9 +13,9 @@ Paweł Kraszewski <root@linuxpedia.pl>
 
 This code depends **only** on:
 
-* `msp430-elf-` GCC 9.x toolchain
-* `mspdebug` programmer
-* `cmake`
+* `msp430-elf-` GCC 9.x toolchain, found at https://www.ti.com/tool/download/MSP430-GCC-OPENSOURCE[www.ti.com]
+* `mspdebug` programmer, found at https://github.com/dlbeer/mspdebug[github.com/dlbeer/mspdebug]
+* `cmake`, found in your distribution's repository.
 
 All device drivers are data-less template classes with inline methods, so they take _no memory_ and usually compile to a _single assembly instruction_:
 

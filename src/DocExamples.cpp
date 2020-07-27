@@ -38,7 +38,7 @@ NOINLINE void bit_reg() {
 
 //------------------------
 // Bit range manipulation
-NOINLINE MSP430::u16 bit_range() {
+NOINLINE MSP430::u8 bit_range() {
 
     // Set bits 4..7 (inclusive, 4 bits total) to a specific value
     p1.OUT.bits<4, 7>() = 5;
@@ -47,7 +47,8 @@ NOINLINE MSP430::u16 bit_range() {
     // bits<4, 7> is the same as bits<7, 4>
 
     // Read bits 2..6 (inclusive, 5 bits total) as an integer
-    return p2.IN.bits<2, 6>();
+    // For safety reasons, explicit cast is required
+    return (MSP430::u8)p2.IN.bits<2, 6>();
 }
 
 int main() {
