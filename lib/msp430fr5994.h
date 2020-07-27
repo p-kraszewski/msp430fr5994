@@ -8,11 +8,11 @@
 
 #pragma once
 
-#include "gpio.h"
-#include "pmm.h"
-#include "timer.h"
-#include "tools.h"
-#include "wdt_a.h"
+#include "drivers/gpio.h"
+#include "drivers/pmm.h"
+#include "drivers/timer.h"
+#include "drivers/tools.h"
+#include "drivers/wdt_a.h"
 
 namespace MSP430::FR5994 {
     using namespace Driver;

@@ -14,8 +14,7 @@ namespace MSP430::Driver::Timer {
     using MSP430::Tools::IOREG;
 
     template <u16 addr, u8 captureRegsCount>
-    class timer {
-      public:
+    struct timer {
         enum class CTLe : u16 {
             //! TBxCLn grouping
             TBCLGRP_M = 0b11 << 13,
@@ -100,7 +99,4 @@ namespace MSP430::Driver::Timer {
             return r;
         }
     };
-
-    template <u16 offs>
-    class rtc_c {};
 }  // namespace MSP430::Driver::Timer

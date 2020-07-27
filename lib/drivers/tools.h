@@ -26,8 +26,8 @@ namespace MSP430 {
     typedef unsigned long u32;
     typedef signed long i32;
 
-    static_assert(sizeof(u8) == 1, "Bad u32/i32");
-    static_assert(sizeof(u16) == 2, "Bad u32/i32");
+    static_assert(sizeof(u8) == 1, "Bad u8/i8");
+    static_assert(sizeof(u16) == 2, "Bad u16/i16");
     static_assert(sizeof(u32) == 4, "Bad u32/i32");
 
     namespace Tools {

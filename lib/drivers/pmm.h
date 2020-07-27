@@ -6,30 +6,21 @@
  * --   https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode        --
  * ------------------------------------------------------------------------*/
 
-#include "lib/msp430fr5994.h"
+#pragma once
 
-#pragma ide diagnostic ignored "EndlessLoop"
+#include "tools.h"
 
-volatile unsigned int i DATA_TINY = 0;
+namespace MSP430::Driver::PMM {
+    using MSP430::Tools::IOREG;
 
-void delay(MSP430::u16 n) {
-    for (i = 0; i < n; i++)
-        ;
-}
+    template <u16 addr>
+    struct pmm {
+        IOREG<u16, addr + 0x00> CTL0;
+        IOREG<u16, addr + 0x02> CTL1;
+        IOREG<u16, addr + 0x0A> IFG;
+        IOREG<u16, addr + 0x10> PM5CTL0;
 
-int main() {
-    using namespace MSP430::FR5994;
+        void unlock_pm5() { PM5CTL0.template bit<0>().clear(); }
+    };
 
-    wdt_a.stop();
-    pmm.unlock_pm5();
-
-    p1.DIR = 0b11;
-    p1.OUT = 0b01;
-
-    while (true) {
-        p1.OUT ^= 0b11;
-        delay(20000);
-    }
-}
-
-// IRQ_HANDLER(irq_TB0_CCR0) {}
+}  // namespace MSP430::Driver::PMM

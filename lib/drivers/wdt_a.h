@@ -21,5 +21,5 @@ namespace MSP430::Driver::WDT_A {
 
         inline void stop() { WDCTL = WDTPW | WDTHOLD; }
         inline void start() { WDCTL = WDTPW; }
-    } PACKED;
+    };
 }  // namespace MSP430::Driver::WDT_A
