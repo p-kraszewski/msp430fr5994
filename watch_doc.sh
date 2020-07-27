@@ -8,17 +8,19 @@
 # --   https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode        --
 # --------------------------------------------------------------------------
 
-TGT="$1"
+TGT="readme.adoc"
+
+PDF="${TGT%.adoc}.pdf"
+echo "${TGT} -> ${PDF}"
 
 if [ ! -r "${TGT}" ]; then
 	echo "${TGT} is not readable"
 	exit 1
 fi
 
-OBJARGS=-dx
-
-msp430-elf-objdump ${OBJARGS} "${TGT}"
+asciidoctor-pdf "${TGT}"
+[ -r "${PDF}" ] && okular "${PDF}"
 
 while inotifywait "${TGT}"; do
-  msp430-elf-objdump ${OBJARGS} "${TGT}"
+  asciidoctor-pdf "${TGT}"
 done

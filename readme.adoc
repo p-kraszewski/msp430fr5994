@@ -1,13 +1,15 @@
-# Pure `MSP430FR5994` firmware in C++
+= Pure `MSP430FR5994` firmware in C++
 Paweł Kraszewski <root@linuxpedia.pl>
 :lang: en
 :source-highlighter: pygments
+:pygments-style: manni
+:pygments-linenums-mode: inline
 :icons: font
 #:sectnums:
 :toc:
 :toclevels: 3
 
-## Features
+== Features
 
 This code depends **only** on:
 
@@ -35,28 +37,11 @@ is compiled into
     mov     #0x5a80, &0x015c
 ----
 
-## Word, byte, bit-range and bit manipulators
+== Word, byte, bit-range and bit manipulators
 
 Each device register is manipulable by a set of methods and operators:
 
-[source,cpp]
+[source,cpp,linenums]
 ----
-#include "lib/msp430fr5994.h"
-
-int main()
-{
-    using namespace MSP430::FR5994;
-
-    p1.OUT = 0xAE;  // Assign a full register
-
-    p1.OUT |= 0x02; // Set mask
-    p1.OUT &= 0xFE; // Clear mask
-    p1.OUT ^= 0x81; // Toggle mask
-
-    p1.OUT += 3;    // Set 3rd bit
-    p1.OUT -= 4;    // Set 4th bit
-    p1.OUT %= 5;    // Flip 5th bit
-
-    p1.OUT.bit<1> = true;
-}
+include::src/DocExamples.cpp[lines=8..]
 ----

@@ -16,7 +16,7 @@
 #define DATA_TINY __attribute((section(".bss.tiny")))
 #define DATA_PERSISTENT __attribute((section(".persistent.low")))
 #define DATA_PERSISTENT_HIGH __attribute((section(".persistent.high")))
-#define NONLINE __attribute((noinline))
+#define NOINLINE __attribute((noinline))
 
 namespace MSP430 {
     typedef unsigned char u8;
@@ -46,12 +46,6 @@ namespace MSP430 {
             inline void clear() { ref() &= ~bitMask; }
 
             inline operator bool() { return (ref() & bitMask) != 0; }
-            inline void operator=(bool v) {
-                if (v)
-                    set();
-                else
-                    clear();
-            }
 
             inline void operator=(reg v) {
                 if (v != 0)
@@ -74,7 +68,8 @@ namespace MSP430 {
             static constexpr u8 bitLength = highBit - lowBit;
             static constexpr u8 sizeInBits = 8 * sizeof(reg);
             static constexpr reg allOnes = ~(reg)0u;
-            static constexpr reg bitMask = allOnes >> (sizeInBits - bitLength);
+            static constexpr reg bitMask = allOnes
+                                           >> (sizeInBits - bitLength - 1);
             static_assert(lowBit + bitLength < sizeInBits,
                           "IOBITRANGE falls of register");
             static_assert(bitLength > 0, "IOBITRANGE null length");
