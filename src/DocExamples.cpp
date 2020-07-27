@@ -26,7 +26,7 @@ NOINLINE void full_reg() {
 NOINLINE void bit_reg() {
 
     p1.OUT += 3;  // Set 3rd bit
-    p2.OUT -= 4;  // Clear 4th
+    p2.OUT -= 4;  // Clear 4th bit
     p3.OUT %= 5;  // Toggle 5th bit
 
     // This form is preferred, as it checks
@@ -44,7 +44,7 @@ NOINLINE MSP430::u8 bit_range() {
     p1.OUT.bits<4, 7>() = 5;
 
     // Order of bit numbers does not matter:
-    // bits<4, 7> is the same as bits<7, 4>
+    // bits<4, 7> has same results as bits<7, 4>
 
     // Read bits 2..6 (inclusive, 5 bits total) as an integer
     // For safety reasons, explicit cast is required

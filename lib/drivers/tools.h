@@ -38,12 +38,13 @@ namespace MSP430 {
          * @tparam bitNo - bit number to access
          */
         template <typename reg, u16 addr, u8 bitNo>
-        class IOBIT {
+        struct IOBIT {
+          private:
+            typedef IOBIT<reg, addr, bitNo> self;
             static constexpr u8 sizeInBits = 8 * sizeof(reg);
             static constexpr reg bitMask = 1u << bitNo;
             static_assert(bitNo < sizeInBits);
 
-          private:
             inline volatile reg &ref() { return *((volatile reg *)addr); }
 
           public:
@@ -80,7 +81,7 @@ namespace MSP430 {
              * Assign value to bit
              * @param v non-zero means 1
              */
-            inline IOBIT<reg, addr, bitNo> &operator=(reg v) {
+            inline self &operator=(reg v) {
                 if (v != 0)
                     set();
                 else
@@ -114,7 +115,9 @@ namespace MSP430 {
          * @tparam lastBit - end of bit range
          */
         template <typename reg, u16 addr, u8 firstBit, u8 lastBit>
-        class IOBITRANGE {
+        struct IOBITRANGE {
+          private:
+            typedef IOBITRANGE<reg, addr, firstBit, lastBit> self;
             static constexpr u8 lowBit =
                 (firstBit > lastBit) ? lastBit : firstBit;
             static constexpr u8 highBit =
@@ -128,7 +131,6 @@ namespace MSP430 {
                           "IOBITRANGE falls of register");
             static_assert(bitLength > 0, "IOBITRANGE null length");
 
-          private:
             inline volatile reg &ref() { return *((volatile reg *)addr); }
 
           public:
@@ -186,7 +188,7 @@ namespace MSP430 {
              * Assign to range
              * @param in new value
              */
-            inline IOBITRANGE<reg, addr, firstBit, lastBit> &operator=(reg in) {
+            inline self &operator=(reg in) {
                 set(in);
                 return *this;
             }
@@ -198,8 +200,9 @@ namespace MSP430 {
          * @tparam addr - base address of port
          */
         template <typename reg, u16 addr>
-        class IOREG {
+        struct IOREG {
           private:
+            typedef IOREG<reg, addr> self;
             inline volatile reg &ref() { return *((volatile reg *)addr); }
 
           public:
@@ -214,7 +217,7 @@ namespace MSP430 {
              * @param in new value
              * @return
              */
-            inline IOREG<reg, addr> &operator=(reg in) {
+            inline self &operator=(reg in) {
                 ref() = in;
                 return *this;
             }
@@ -307,9 +310,10 @@ namespace MSP430 {
 
             /**
              * Return single bit accessor.
-             * @tparam bitNr bit number. It is compile-time checked for
-             * validity.
-             * @return
+             * - Bit number 0 is leftmost.
+             * - bitNr is compile-time checked for validity.
+             * @tparam bitNr bit number
+             * @return accessor
              */
             template <u8 bitNr>
             inline IOBIT<reg, addr, bitNr> bit() {
@@ -319,11 +323,12 @@ namespace MSP430 {
 
             /**
              * Return bit range accessor.
-             * Order of ends does not matter. Ends are compile-time checked for
-             * validity.
+             * - Bit number 0 is leftmost.
+             * - Order of ends does not matter.
+             * - Ends are compile-time checked for validity.
              * @tparam firstBit begin of bit range, inclusive
              * @tparam lastBit  end of bit range, inclusive
-             * @return
+             * @return accessor
              */
             template <u8 firstBit, u8 lastBit>
             inline IOBITRANGE<reg, addr, firstBit, lastBit> bits() {
