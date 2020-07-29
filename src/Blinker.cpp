@@ -10,9 +10,8 @@
 
 #pragma ide diagnostic ignored "EndlessLoop"
 
-volatile unsigned int i DATA_TINY = 0;
-
 void delay(MSP430::u16 n) {
+    static volatile unsigned int i DATA_TINY = 0;
     for (i = 0; i < n; i++)
         ;
 }
