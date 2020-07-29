@@ -34,5 +34,6 @@ namespace MSP430::FR5994 {
     Driver::Timer::TA<0x380, 3> ta1;
     Driver::Timer::TA<0x380, 2> ta2;
     Driver::Timer::TA<0x440, 2> ta3;
+    Driver::Timer::TA<0x7C0, 2> ta4;
     Driver::Timer::TB<0x3C0, 7> tb0;
 }  // namespace MSP430::FR5994
