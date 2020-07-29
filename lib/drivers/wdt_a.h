@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include "tools.h"
 namespace MSP430::Driver::WDT_A {
 
     using MSP430::Tools::IOREG;
@@ -34,10 +35,10 @@ namespace MSP430::Driver::WDT_A {
     };
 
     enum class CLK : u16 {
-        SM = 0b00 << 5,
-        A = 0b01 << 5,
-        VLO = 0b10 << 5,
-        K = 0b11 << 5,
+        SMCLK = 0b00 << 5,   //!< Config-dependent
+        ACLK = 0b01 << 5,    //!< Config-dependent
+        VLOCLK = 0b10 << 5,  //!< interal ~10kHz
+        X_CLK = 0b11 << 5,   //!< same as `VLOCLK` fo 5994
     };
 
     enum class MODE : u16 {
@@ -73,14 +74,27 @@ namespace MSP430::Driver::WDT_A {
 
         IOREG<u16, addr> WDCTL;
 
+        /**
+         * Write to `WDCTL` automatically setting proper PW
+         * @param val new value (only lower 8 bits matter)
+         */
         inline void write(u16 val) { WDCTL = (CTL::PW | (val & 0xFF)); }
 
-        inline void reload() { write(WDCTL.get() | CTL::CLR); }
-        inline void stop() { write(WDCTL.get() | CTL::HOLD); }
-        inline void start() { write(WDCTL.get() & ~CTL::HOLD); }
+        /**
+         * Stop watchdog
+         */
+        inline void stop() { write(CTL::HOLD); }
 
-        template <CLK ClkSource, INTERVAL Interval, MODE Mode>
-        inline void setup() {
+        /**
+         * (re)start watchdog
+         * default template parameters give *1s timeout* on demo board
+         * @tparam ClkSource clock source for counter
+         * @tparam Interval range of counter
+         * @tparam Mode mode of operation (watchdog/timer)
+         */
+        template <CLK ClkSource = CLK::SMCLK,
+                  INTERVAL Interval = INTERVAL::T_1s, MODE Mode = MODE::WD>
+        inline void restart() {
             write((u16)ClkSource | (u16)Interval | (u16)Mode | CTL::CLR);
         }
     };
