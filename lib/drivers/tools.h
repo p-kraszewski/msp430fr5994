@@ -33,9 +33,9 @@ namespace MSP430 {
     namespace Tools {
         /**
          * Image of a single bit of a specific port
-         * @tparam reg - type of port: u16 or u8
-         * @tparam addr - base address of port
-         * @tparam bitNo - bit number to access
+         * @tparam reg type of port: u16 or u8
+         * @tparam addr base address of port
+         * @tparam bitNo bit number to access
          */
         template <typename reg, u16 addr, u8 bitNo>
         struct IOBIT {
@@ -109,10 +109,10 @@ namespace MSP430 {
          * Image of a bit range of a specific port.
          * Order of `firstBit` and `lastBit` does not matter
          *
-         * @tparam reg - type of port: u16 or u8
-         * @tparam addr - address of port
-         * @tparam firstBit - begin of bit range
-         * @tparam lastBit - end of bit range
+         * @tparam reg type of port: u16 or u8
+         * @tparam addr address of port
+         * @tparam firstBit begin of bit range
+         * @tparam lastBit end of bit range
          */
         template <typename reg, u16 addr, u8 firstBit, u8 lastBit>
         struct IOBITRANGE {
@@ -196,8 +196,8 @@ namespace MSP430 {
 
         /**
          * Image of single port of device
-         * @tparam reg - type of port: u16 or u8
-         * @tparam addr - base address of port
+         * @tparam reg type of port: u16 or u8
+         * @tparam addr base address of port
          */
         template <typename reg, u16 addr>
         struct IOREG {
@@ -338,14 +338,14 @@ namespace MSP430 {
 
             /**
              * Check if **all** bits selected by mask are set
-             * @param mask - bits to check
+             * @param mask bits to check
              * @return
              */
             inline bool operator&&(reg mask) { return (ref() & mask) == mask; }
 
             /**
              * Check if **any** bit selected by mask is set
-             * @param mask - bits to check
+             * @param mask bits to check
              * @return
              */
             inline bool operator||(reg mask) { return (ref() & mask) != 0; }

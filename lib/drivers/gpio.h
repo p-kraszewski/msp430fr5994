@@ -12,6 +12,10 @@
 namespace MSP430::Driver::GPIO {
     using MSP430::Tools::IOREG;
 
+    /**
+     * Generic simple I/O port interface
+     * @tparam addr base address of device
+     */
     template <u16 addr>
     struct port_simple {
         IOREG<u8, addr + 0x00> IN;
@@ -23,6 +27,10 @@ namespace MSP430::Driver::GPIO {
         IOREG<u8, addr + 0x0E> SELC;
     };
 
+    /**
+     * Generic interrupt-generating I/O port interface
+     * @tparam addr base address of device
+     */
     template <u16 addr>
     struct port_int : public port_simple<addr> {
         IOREG<u8, addr + 0x16> IV;
