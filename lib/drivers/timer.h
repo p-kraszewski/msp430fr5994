@@ -13,9 +13,14 @@
 namespace MSP430::Driver::Timer {
     using MSP430::Tools::IOREG;
 
+    /**
+     * Generic TA timer interface
+     * @tparam addr base address of device
+     * @tparam captureRegsCount capture register count for this specific timer
+     */
     template <u16 addr, u8 captureRegsCount>
-    struct TATB {
-        enum class CTLA : u16 {
+    struct TA {
+        enum CTL : u16 {
 
             CLK_M = 0b11 << 8,   //!< Timer_A clock source select
             CLK_TA = 0b00 << 8,  //!< TAxCLK
@@ -54,7 +59,35 @@ namespace MSP430::Driver::Timer {
             TBIFG_P = 0b1 << 0,  //!< Interrupt pending
         };
 
-        enum class CTLB : u16 {
+        IOREG<u16, addr + 0x00> CTL;
+        IOREG<u16, addr + 0x10> R;
+        IOREG<u16, addr + 0x20> EX0;
+        IOREG<u16, addr + 0x2E> IV;
+
+        template <u8 nr>
+        IOREG<u16, addr + 2 + 2 * nr> cctl() {
+            static_assert(nr < captureRegsCount);
+            IOREG<u16, addr + 2 + 2 * nr> r;
+            return r;
+        }
+
+        template <u8 nr>
+        IOREG<u16, addr + 12 + 2 * nr> ccr() {
+            static_assert(nr < captureRegsCount);
+            IOREG<u16, addr + 12 + 2 * nr> r;
+            return r;
+        }
+    };
+
+    /**
+     * Generic TB timer interface
+     * @tparam addr base address of device
+     * @tparam captureRegsCount capture register count for this specific timer
+     */
+    template <u16 addr, u8 captureRegsCount>
+    struct TB {
+
+        enum CTL : u16 {
             //! TBxCLn grouping
             TBCLGRP_M = 0b11 << 13,
 
@@ -89,20 +122,20 @@ namespace MSP430::Driver::Timer {
             CLK_IN = 0b11 << 8,  //!< INCLK
 
             DIV_M = 0b11 << 6,  //!< Input divider. These bits, along with the
-                                //!< TBIDEX bits, select the divider for the
-                                //!< input clock.
+            //!< TBIDEX bits, select the divider for the
+            //!< input clock.
             DIV_1 = 0b00 << 6,  //!< 1
             DIV_2 = 0b01 << 6,  //!< 1/2
             DIV_4 = 0b10 << 6,  //!< 1/4
             DIV_8 = 0b11 << 6,  //!< 1/8
 
-            MODE_M = 0b11 << 4,   //!< Mode mask
-            STOP = 0b00 << 4,     //!< Stop mode: Driver is halted
-            UP = 0b01 << 4,       //!< Up mode: Driver counts up to TBxCL0
-            CONT = 0b10 << 4,     //!< Continuous mode: Driver counts up to the
-                                  //!< value set by CNTL
+            MODE_M = 0b11 << 4,  //!< Mode mask
+            STOP = 0b00 << 4,    //!< Stop mode: Driver is halted
+            UP = 0b01 << 4,      //!< Up mode: Driver counts up to TBxCL0
+            CONT = 0b10 << 4,    //!< Continuous mode: Driver counts up to the
+            //!< value set by CNTL
             UP_DOWN = 0b11 << 4,  //!< Up/down mode: Driver counts up to TBxCL0
-                                  //!< and down to 0000h
+            //!< and down to 0000h
 
             TBCLR = 1 << 2,  //!< Setting this bit clears TBR, the clock divider
             //!< logic (the divider setting remains unchanged), and
@@ -110,7 +143,7 @@ namespace MSP430::Driver::Timer {
             //!< automatically reset and is always read as zero.
 
             TBIE_M = 0b1 << 1,  //!< Timer_B interrupt enable. This bit enables
-                                //!< the TBIFG interrupt request.
+            //!< the TBIFG interrupt request.
             TBIE_D = 0b1 << 1,  //!< Interrupt disabled
             TBIE_E = 0b1 << 1,  //!< Interrupt enabled
 
