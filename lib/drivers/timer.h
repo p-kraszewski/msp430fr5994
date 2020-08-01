@@ -72,9 +72,9 @@ namespace MSP430::Driver::Timer {
         }
 
         template <u8 nr>
-        IOREG<u16, addr + 12 + 2 * nr> ccr() {
+        IOREG<u16, addr + 0x12 + 2 * nr> ccr() {
             static_assert(nr < captureRegsCount);
-            IOREG<u16, addr + 12 + 2 * nr> r;
+            IOREG<u16, addr + 0x12 + 2 * nr> r;
             return r;
         }
     };
