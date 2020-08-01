@@ -352,4 +352,71 @@ namespace MSP430 {
         };
 
     }  // namespace Tools
+
+    namespace SR {
+        /** Missing intrinsic to set bits in SR/r2 register */
+        inline void set(u16 mask) {
+            __asm__ volatile("bis.w %0, sr" ::"i"(mask));
+        }
+
+        /** Missing intrinsic to set bits in stack-copy of SR/r2 register, to be
+         * user after RETI */
+        inline void set_on_exit(u16 mask) { __bis_SR_register_on_exit(mask); }
+
+        /** Missing intrinsic to clear bits in SR/r2 register */
+        inline void clear(u16 mask) {
+            __asm__ volatile("bic.w %0, sr" ::"i"(mask));
+        }
+
+        /** Missing intrinsic to clear bits in stack-copy of SR/r2 register, to
+         * be user after RETI */
+        inline void clear_on_exit(u16 mask) { __bic_SR_register_on_exit(mask); }
+    }  // namespace SR
+
+    enum class POWER { MODE0, MODE1, MODE2, MODE3, MODE4 };
+
+    void enable_interrupts() {
+        __asm__ volatile("nop");
+        SR::set(1u << 3u);
+        __asm__ volatile("nop");
+    }
+
+    void disable_interrupts() {
+        __asm__ volatile("nop");
+        SR::clear(1u << 3u);
+        __asm__ volatile("nop");
+    }
+
+    void set_low_power(POWER mode) {
+        enum u16 {
+            GIE    = 1u << 3u,
+            CPUOFF = 1u << 4u,
+            OSCOFF = 1u << 5u,
+            SCG0   = 1u << 6u,
+            SCG1   = 1u << 7u,
+        };
+
+        switch (mode) {
+            case POWER::MODE0: {
+                SR::set(GIE | CPUOFF);
+                break;
+            }
+            case POWER::MODE1: {
+                SR::set(GIE | CPUOFF | SCG0);
+                break;
+            }
+            case POWER::MODE2: {
+                SR::set(GIE | CPUOFF | SCG1);
+                break;
+            }
+            case POWER::MODE3: {
+                SR::set(GIE | CPUOFF | SCG0 | SCG1);
+                break;
+            }
+            case POWER::MODE4: {
+            }
+                SR::set(GIE | CPUOFF | OSCOFF | SCG0 | SCG1);
+                break;
+        }
+    }
 }  // namespace MSP430
