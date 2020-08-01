@@ -7,17 +7,9 @@
  * ------------------------------------------------------------------------*/
 
 .macro IRQ handler
-    .weak  irq_\handler
-    .set   irq_\handler, vec_Unhandled
-    .word  irq_\handler
+   .weak  irq_\handler
+   .word  irq_\handler
 .endm
-
-.macro DEV base name
-    .org  \base - 0x100
-    .global io_\name
-io_\name:
-.endm
-
 
 .section .Reset, "ax"
 .global vec_Reset
