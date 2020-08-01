@@ -35,23 +35,23 @@ namespace MSP430::Driver::WDT_A {
     };
 
     enum class CLK : u16 {
-        SMCLK = 0b00 << 5,   //!< Config-dependent
-        ACLK = 0b01 << 5,    //!< Config-dependent
+        SMCLK  = 0b00 << 5,  //!< Config-dependent
+        ACLK   = 0b01 << 5,  //!< Config-dependent
         VLOCLK = 0b10 << 5,  //!< interal ~10kHz
-        X_CLK = 0b11 << 5,   //!< same as `VLOCLK` fo 5994
+        X_CLK  = 0b11 << 5,  //!< same as `VLOCLK` fo 5994
     };
 
     enum class MODE : u16 {
         // Watchdog timer mode select
-        WD = 0 << 4,   //!< Watchdog mode
+        WD  = 0 << 4,  //!< Watchdog mode
         TIM = 1 << 4,  //!< Interval timer mode
     };
 
     enum class INTERVAL : u16 {
         // Watchdog timer interval select. These bits select the watchdog
         // timer interval to set the WDTIFG flag or generate a PUC.
-        I2_6 = 7,   //!< 64
-        I2_9 = 6,   //!< 512
+        I2_6  = 7,  //!< 64
+        I2_9  = 6,  //!< 512
         I2_13 = 5,  //!< 8'192
         I2_15 = 4,  //!< 32'768
         I2_19 = 3,  //!< 524'288
@@ -59,14 +59,14 @@ namespace MSP430::Driver::WDT_A {
         I2_27 = 1,  //!< 134'217'728
         I2_31 = 0,  //!< 2'147'483'648
 
-        T_2ms = 7,    //!< 1.95 ms at 32.768 kHz
-        T_16ms = 6,   //!< 15.625 ms at 32.768 kHz
+        T_2ms   = 7,  //!< 1.95 ms at 32.768 kHz
+        T_16ms  = 6,  //!< 15.625 ms at 32.768 kHz
         T_250ms = 5,  //!< 250 ms at 32.768 kHz
-        T_1s = 4,     //!< 1 s at 32.768 kHz
-        T_16s = 3,    //!< 00:00:16 at 32.768 kHz
-        T_5m = 2,     //!< 00:04:16 at 32.768 kHz
-        T_1h = 1,     //!< 01:08:16 at 32.768 kHz
-        T_18h = 0,    //!< 18:12:16 at 32.768 kHz
+        T_1s    = 4,  //!< 1 s at 32.768 kHz
+        T_16s   = 3,  //!< 00:00:16 at 32.768 kHz
+        T_5m    = 2,  //!< 00:04:16 at 32.768 kHz
+        T_1h    = 1,  //!< 01:08:16 at 32.768 kHz
+        T_18h   = 0,  //!< 18:12:16 at 32.768 kHz
     };                // namespace MSP430::Driver::WDT_A
 
     template <u16 addr>
@@ -92,7 +92,7 @@ namespace MSP430::Driver::WDT_A {
          * @tparam Interval range of counter
          * @tparam Mode mode of operation (watchdog/timer)
          */
-        template <CLK ClkSource = CLK::SMCLK,
+        template <CLK      ClkSource = CLK::SMCLK,
                   INTERVAL Interval = INTERVAL::T_1s, MODE Mode = MODE::WD>
         inline void restart() {
             write((u16)ClkSource | (u16)Interval | (u16)Mode | CTL::CLR);

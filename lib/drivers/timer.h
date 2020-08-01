@@ -20,11 +20,11 @@ namespace MSP430::Driver::Timer {
      */
     template <u16 addr, u8 captureRegsCount>
     struct TA {
-        enum CTL : u16 {
+        enum CTLe : u16 {
 
-            CLK_M = 0b11 << 8,   //!< Timer_A clock source select
+            CLK_M  = 0b11 << 8,  //!< Timer_A clock source select
             CLK_TA = 0b00 << 8,  //!< TAxCLK
-            CLK_A = 0b01 << 8,   //!< ACLK
+            CLK_A  = 0b01 << 8,  //!< ACLK
             CLK_SM = 0b10 << 8,  //!< SMCLK
             CLK_IN = 0b11 << 8,  //!< INCLK
 
@@ -37,9 +37,9 @@ namespace MSP430::Driver::Timer {
             DIV_8 = 0b11 << 6,  //!< 1/8
 
             MODE_M = 0b11 << 4,  //!< Mode mask
-            STOP = 0b00 << 4,    //!< Stop mode: Driver is halted
-            UP = 0b01 << 4,      //!< Up mode: Driver counts up to TBxCL0
-            CONT = 0b10 << 4,    //!< Continuous mode: Driver counts up to the
+            STOP   = 0b00 << 4,  //!< Stop mode: Driver is halted
+            UP     = 0b01 << 4,  //!< Up mode: Driver counts up to TBxCL0
+            CONT   = 0b10 << 4,  //!< Continuous mode: Driver counts up to the
             //!< value set by CNTL
             UP_DOWN = 0b11 << 4,  //!< Up/down mode: Driver counts up to TBxCL0
             //!< and down to 0000h
@@ -80,14 +80,14 @@ namespace MSP430::Driver::Timer {
     };
 
     /**
-     * Generic TB timer interface
+     * Generic TB timer interface is TA with additional settings
      * @tparam addr base address of device
      * @tparam captureRegsCount capture register count for this specific timer
      */
     template <u16 addr, u8 captureRegsCount>
-    struct TB {
+    struct TB : TA<addr, captureRegsCount> {
 
-        enum CTL : u16 {
+        enum CTLe : u16 {
             //! TBxCLn grouping
             TBCLGRP_M = 0b11 << 13,
 
@@ -109,15 +109,15 @@ namespace MSP430::Driver::Timer {
             //! (TBxCCR1 CLLD bits control the update)
             TBCLGRP_7 = 0b11 << 13,
 
-            CNTL_M = 0b11 << 11,   //!< Counter length
+            CNTL_M  = 0b11 << 11,  //!< Counter length
             CNTL_16 = 0b00 << 11,  //!< 16-bit, TBxR(max) = 0FFFFh
             CNTL_12 = 0b01 << 11,  //!< 12-bit, TBxR(max) = 0FFFh
             CNTL_10 = 0b10 << 11,  //!< 10-bit, TBxR(max) = 03FFh
             CNTL_08 = 0b11 << 11,  //!< 8-bit, TBxR(max) = 0FFh
 
-            CLK_M = 0b11 << 8,   //!< Timer_B clock source select
+            CLK_M  = 0b11 << 8,  //!< Timer_B clock source select
             CLK_TB = 0b00 << 8,  //!< TAxCLK
-            CLK_A = 0b01 << 8,   //!< ACLK
+            CLK_A  = 0b01 << 8,  //!< ACLK
             CLK_SM = 0b10 << 8,  //!< SMCLK
             CLK_IN = 0b11 << 8,  //!< INCLK
 
@@ -130,9 +130,9 @@ namespace MSP430::Driver::Timer {
             DIV_8 = 0b11 << 6,  //!< 1/8
 
             MODE_M = 0b11 << 4,  //!< Mode mask
-            STOP = 0b00 << 4,    //!< Stop mode: Driver is halted
-            UP = 0b01 << 4,      //!< Up mode: Driver counts up to TBxCL0
-            CONT = 0b10 << 4,    //!< Continuous mode: Driver counts up to the
+            STOP   = 0b00 << 4,  //!< Stop mode: Driver is halted
+            UP     = 0b01 << 4,  //!< Up mode: Driver counts up to TBxCL0
+            CONT   = 0b10 << 4,  //!< Continuous mode: Driver counts up to the
             //!< value set by CNTL
             UP_DOWN = 0b11 << 4,  //!< Up/down mode: Driver counts up to TBxCL0
             //!< and down to 0000h
@@ -151,24 +151,5 @@ namespace MSP430::Driver::Timer {
             TBIFG_N = 0b0 << 0,  //!< No interrupt pending
             TBIFG_P = 0b1 << 0,  //!< Interrupt pending
         };
-
-        IOREG<u16, addr + 0x00> CTL;
-        IOREG<u16, addr + 0x10> R;
-        IOREG<u16, addr + 0x20> EX0;
-        IOREG<u16, addr + 0x2E> IV;
-
-        template <u8 nr>
-        IOREG<u16, addr + 2 + 2 * nr> cctl() {
-            static_assert(nr < captureRegsCount);
-            IOREG<u16, addr + 2 + 2 * nr> r;
-            return r;
-        }
-
-        template <u8 nr>
-        IOREG<u16, addr + 12 + 2 * nr> ccr() {
-            static_assert(nr < captureRegsCount);
-            IOREG<u16, addr + 12 + 2 * nr> r;
-            return r;
-        }
     };
 }  // namespace MSP430::Driver::Timer

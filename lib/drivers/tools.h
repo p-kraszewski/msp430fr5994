@@ -13,12 +13,12 @@
     extern "C" __attribute__(                                                  \
         (noipa, used, interrupt, section(".text"))) void irq_##id()
 
-#define CODE_HIGH __attribute((section(".text.high")))
-#define DATA_LEA __attribute((section(".bss.lea")))
-#define DATA_TINY __attribute((section(".bss.tiny")))
-#define DATA_PERSISTENT __attribute((section(".persistent.low")))
+#define CODE_HIGH            __attribute((section(".text.high")))
+#define DATA_LEA             __attribute((section(".bss.lea")))
+#define DATA_TINY            __attribute((section(".bss.tiny")))
+#define DATA_PERSISTENT      __attribute((section(".persistent.low")))
 #define DATA_PERSISTENT_HIGH __attribute((section(".persistent.high")))
-#define NOINLINE __attribute((noinline))
+#define NOINLINE             __attribute((noinline))
 
 namespace MSP430 {
     typedef __UINT8_TYPE__  u8;
@@ -39,8 +39,10 @@ namespace MSP430 {
         struct IOBIT {
           private:
             typedef IOBIT<reg, addr, bitNo> self;
-            static constexpr u8 sizeInBits = 8 * sizeof(reg);
-            static constexpr reg bitMask = 1u << bitNo;
+
+            static constexpr u8  sizeInBits = 8 * sizeof(reg);
+            static constexpr reg bitMask    = 1u << bitNo;
+
             static_assert(bitNo < sizeInBits);
 
             inline volatile reg &ref() { return *((volatile reg *)addr); }
@@ -116,14 +118,14 @@ namespace MSP430 {
         struct IOBITRANGE {
           private:
             typedef IOBITRANGE<reg, addr, firstBit, lastBit> self;
-            static constexpr u8 lowBit =
+            static constexpr u8                              lowBit =
                 (firstBit > lastBit) ? lastBit : firstBit;
             static constexpr u8 highBit =
                 (firstBit > lastBit) ? firstBit : lastBit;
-            static constexpr u8 bitLength = highBit - lowBit;
-            static constexpr u8 sizeInBits = 8 * sizeof(reg);
-            static constexpr reg allOnes = ~(reg)0u;
-            static constexpr reg bitMask = allOnes
+            static constexpr u8  bitLength  = highBit - lowBit;
+            static constexpr u8  sizeInBits = 8 * sizeof(reg);
+            static constexpr reg allOnes    = ~(reg)0u;
+            static constexpr reg bitMask    = allOnes
                                            >> (sizeInBits - bitLength - 1);
             static_assert(lowBit + bitLength < sizeInBits,
                           "IOBITRANGE falls of register");
@@ -201,7 +203,7 @@ namespace MSP430 {
         struct IOREG {
           private:
             typedef IOREG<reg, addr> self;
-            inline volatile reg &ref() { return *((volatile reg *)addr); }
+            inline volatile reg &    ref() { return *((volatile reg *)addr); }
 
           public:
             /**
