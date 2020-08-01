@@ -21,16 +21,12 @@
 #define NOINLINE __attribute((noinline))
 
 namespace MSP430 {
-    typedef unsigned char u8;
-    typedef signed char i8;
-    typedef unsigned short u16;
-    typedef signed short i16;
-    typedef unsigned long u32;
-    typedef signed long i32;
-
-    static_assert(sizeof(u8) == 1, "Bad u8/i8");
-    static_assert(sizeof(u16) == 2, "Bad u16/i16");
-    static_assert(sizeof(u32) == 4, "Bad u32/i32");
+    typedef __UINT8_TYPE__  u8;
+    typedef __INT8_TYPE__   i8;
+    typedef __UINT16_TYPE__ u16;
+    typedef __INT16_TYPE__  i16;
+    typedef __UINT32_TYPE__ u32;
+    typedef __INT32_TYPE__  i32;
 
     namespace Tools {
         /**
