@@ -15,7 +15,7 @@ SET(MSP_PREFIX msp430-elf-)
 SET(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/msp430fr5994.ld)
 SET(COMP_ARCH "-mcpu=msp430x -mmcu=msp430fr5994")
 
-SET(LINKER_FLAGS "-nostdlib -static -mlarge")
+SET(LINKER_FLAGS "-nostdlib -static -mlarge -Wl,--whole-archive")
 SET(C_FLAGS "-O3 -mlarge -mhwmult=auto")
 SET(ASM_FLAGS "-ml")
 

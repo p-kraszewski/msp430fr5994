@@ -15,7 +15,7 @@ if [ ! -r "${TGT}" ]; then
 	exit 1
 fi
 
-OBJARGS=-dx
+OBJARGS=-dxs
 
 msp430-elf-objdump ${OBJARGS} "${TGT}"
 

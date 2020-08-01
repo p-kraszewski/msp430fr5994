@@ -1,22 +1,35 @@
 ---
 # BasedOnStyle:  Google
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros: true
 AccessModifierOffset:                           -2
 ConstructorInitializerIndentWidth:              4
 AlignTrailingComments:                          true
 AllowAllParametersOfDeclarationOnNextLine:      true
+AllowShortCaseLabelsOnASingleLine: true
 AllowShortIfStatementsOnASingleLine:            Never
 AllowShortLoopsOnASingleLine:                   true
+AllowShortFunctionsOnASingleLine: All
+AllowShortLambdasOnASingleLine: All
 AlwaysBreakTemplateDeclarations:                Yes
 AlwaysBreakBeforeMultilineStrings:              true
 BreakBeforeBinaryOperators:                     NonAssignment
 BreakBeforeTernaryOperators:                    true
-BreakConstructorInitializersBeforeComma:        true
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+BreakStringLiterals: true
 BinPackParameters:                              true
+BinPackArguments: true
 ColumnLimit:                                    80
 ConstructorInitializerAllOnOneLineOrOnePerLine: true
 #DerivePointerAlignment: true
 ExperimentalAutoDetectBinPacking:               false
+FixNamespaceComments: true
 IndentCaseLabels:                               true
+IndentGotoLabels: true
+IndentPPDirectives: BeforeHash
+IncludeBlocks: Regroup
 #IndentWrappedFunctionNames: false
 MaxEmptyLinesToKeep:                            1
 NamespaceIndentation:                           All
@@ -41,3 +54,11 @@ SpacesInCStyleCastParentheses:                  false
 SpaceBeforeAssignmentOperators:                 true
 ContinuationIndentWidth:                        4
 SortIncludes:                                   true
+SortUsingDeclarations: true
+IncludeCategories:
+  - Regex:           '^"drivers/tools.h'
+    Priority:        1
+    SortPriority: 1
+  - Regex:           '^"drivers/.*'
+    Priority:        1
+    SortPriority: 2
