@@ -19,7 +19,7 @@ SET(LINKER_FLAGS "-nostdlib -static -mlarge -Wl,--whole-archive")
 SET(C_FLAGS "-O3 -mlarge -mhwmult=auto")
 SET(ASM_FLAGS "-ml")
 
-SET(CMAKE_CXX_STANDARD 17)
+SET(CMAKE_CXX_STANDARD 20)
 
 SET(CMAKE_ASM_COMPILER ${MSP_PREFIX}as)
 SET(CMAKE_C_COMPILER ${MSP_PREFIX}gcc)
