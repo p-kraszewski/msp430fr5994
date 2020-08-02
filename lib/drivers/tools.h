@@ -122,11 +122,10 @@ namespace MSP430 {
                 (firstBit > lastBit) ? lastBit : firstBit;
             static constexpr u8 highBit =
                 (firstBit > lastBit) ? firstBit : lastBit;
-            static constexpr u8  bitLength  = highBit - lowBit;
+            static constexpr u8  bitLength  = 1 + highBit - lowBit;
             static constexpr u8  sizeInBits = 8 * sizeof(reg);
             static constexpr reg allOnes    = ~(reg)0u;
-            static constexpr reg bitMask    = allOnes
-                                           >> (sizeInBits - bitLength - 1);
+            static constexpr reg bitMask = allOnes >> (sizeInBits - bitLength);
             static_assert(lowBit + bitLength < sizeInBits,
                           "IOBITRANGE falls of register");
             static_assert(bitLength > 0, "IOBITRANGE null length");
@@ -418,5 +417,21 @@ namespace MSP430 {
                 SR::set(GIE | CPUOFF | OSCOFF | SCG0 | SCG1);
                 break;
         }
+    }
+
+    template <u8 firstBit, u8 lastBit, typename cell = u16>
+    inline void mask_write(cell &data, cell value) {
+        static constexpr u8 lowBit  = (firstBit > lastBit) ? lastBit : firstBit;
+        static constexpr u8 highBit = (firstBit > lastBit) ? firstBit : lastBit;
+        static constexpr u8 bitLength  = 1 + highBit - lowBit;
+        static constexpr u8 sizeInBits = 8 * sizeof(cell);
+        static constexpr cell allOnes  = ~(cell)0u;
+        static constexpr cell bitMask  = allOnes >> (sizeInBits - bitLength);
+        static_assert(lowBit + bitLength < sizeInBits,
+                      "mask_write falls of register");
+        static_assert(bitLength > 0, "mask_write null length");
+
+        data &= ~(bitMask << lowBit);
+        data |= (value & bitMask) << lowBit;
     }
 }  // namespace MSP430
