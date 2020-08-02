@@ -81,7 +81,114 @@ namespace MSP430::Driver::Clock {
     template <u16 addr>
     struct cs {
       private:
-        constexpr static u16 CTL0_Key = 0xA500;
+        struct Mutator {
+            MSP430::Driver::Clock::cs<addr> &clk;
+            u16                              R0, R1, R2, R3, R4, R5, R6;
+            bool                             R1c, R2c, R3c, R4c, R5c, R6c;
+
+            Mutator(MSP430::Driver::Clock::cs<addr> clk, bool update)
+                : clk(clk)
+                , R0(0xA500)
+                , R1(update ? clk.CTL1.get() : 0)
+                , R2(update ? clk.CTL2.get() : 0)
+                , R3(update ? clk.CTL3.get() : 0)
+                , R4(update ? clk.CTL4.get() : 0)
+                , R5(update ? clk.CTL5.get() : 0)
+                , R6(update ? clk.CTL6.get() : 0)
+                , R1c(false)
+                , R2c(false)
+                , R3c(false)
+                , R4c(false)
+                , R5c(false)
+                , R6c(false) {}
+
+            ~Mutator() {
+                clk.CTL0 = 0xA500;
+                if (R1c)
+                    clk.CTL1 = R1;
+                if (R2c)
+                    clk.CTL2 = R2;
+                if (R3c)
+                    clk.CTL3 = R3;
+                if (R4c)
+                    clk.CTL4 = R4;
+                if (R5c)
+                    clk.CTL5 = R5;
+                if (R6c)
+                    clk.CTL6 = R6;
+            }
+
+            Mutator &Set_DCO(DCO freq) {
+                R1c = true;
+                R1  = (u16)freq;
+                return *this;
+            }
+
+            Mutator &Set_ACLK(ACLK src, DIV div) {
+                R2c = true;
+                R3c = true;
+                mask_write<10, 8>(R2, (u16)src);
+                mask_write<10, 8>(R3, (u16)div);
+                return *this;
+            }
+
+            Mutator &Set_SMCLK(MCLK src, DIV div) {
+                R2c = true;
+                R3c = true;
+                mask_write<6, 4>(R2, (u16)src);
+                mask_write<6, 4>(R3, (u16)div);
+                return *this;
+            }
+
+            Mutator &Set_MCLK(MCLK src, DIV div) {
+                R2c = true;
+                R3c = true;
+                mask_write<2, 0>(R2, (u16)src);
+                mask_write<2, 0>(R3, (u16)div);
+                return *this;
+            }
+
+            Mutator &Set_HFXT(HF freq, DRIVE drive = DRIVE::LOW,
+                              bool bypass = false) {
+                R4c = true;
+                mask_write<15, 14>(R4, (u16)drive);
+                mask_write<12, 12>(R4, (u16)bypass);
+                mask_write<11, 10>(R4, (u16)freq);
+                mask_write<8, 8>(R4, (u16)0);
+                return *this;
+            }
+            Mutator &Enable_HFXT(bool on) {
+                R4c = true;
+                mask_write<8, 8>(R4, (u16)!on);
+                return *this;
+            }
+
+            Mutator &Set_LFXT(DRIVE drive = DRIVE::LOW, bool bypass = false) {
+                R4c = true;
+                mask_write<7, 6>(R4, (u16)drive);
+                mask_write<4, 4>(R4, (u16)bypass);
+                mask_write<0, 0>(R4, (u16)0);
+                return *this;
+            }
+
+            Mutator &Enable_LFXT(bool on) {
+                R4c = true;
+                mask_write<0, 0>(R4, (u16)!on);
+                return *this;
+            }
+
+            Mutator &Enable_VLO(bool on) {
+                R4c = true;
+                mask_write<3, 3>(R4, (u16)!on);
+                return *this;
+            }
+
+            Mutator &Enable_SMCLK(bool on) {
+                R4c = true;
+                mask_write<1, 1>(R4, (u16)!on);
+                return *this;
+            }
+        };
 
       public:
         IOREG<u16, addr + 0x00> CTL0;
@@ -92,13 +199,14 @@ namespace MSP430::Driver::Clock {
         IOREG<u16, addr + 0x0A> CTL5;
         IOREG<u16, addr + 0x0C> CTL6;
 
-        void unlock() { CTL0 = CTL0_Key; }
-        void set_dco_freq(DCO f) { CTL1 = (u16)f; }
-        void set_sources(ACLK aclk, MCLK smclk, MCLK mclk) {
-            CTL2 = ((u16)aclk) << 8 | ((u16)smclk) << 4 | ((u16)mclk);
+        Mutator New() {
+            Mutator t(*this, false);
+            return t;
         }
-        void set_dividers(DIV aclk, DIV smclk, DIV mclk) {
-            CTL3 = ((u16)aclk) << 8 | ((u16)smclk) << 4 | ((u16)mclk);
+
+        Mutator Update() {
+            Mutator t(*this, true);
+            return t;
         }
     };
 }  // namespace MSP430::Driver::Clock
